@@ -7,8 +7,12 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private RectTransform hudContainer = null;
-
+    [SerializeField] private HUDBase hudPrefab = null;
+    
+    
     private AnimationConfig animationCfg;
+    
+    private Dictionary<EntityBase, HUDBase> entityHUDS = new Dictionary<EntityBase, HUDBase>();
 
     public void Init()
     {
@@ -17,16 +21,38 @@ public class UIManager : MonoBehaviour
         
     }
 
+    public void SetHUDForEntity(EntityBase entityBase)
+    {
+        HUDBase newHud = ObjectPool.Spawn(hudPrefab, Vector3.zero, Quaternion.identity, hudContainer);
+        
+        entityHUDS.Add(entityBase, newHud);
+        
+        entityBase.OnDeath += EntityBaseOnDeath;
+    }
+
+    private void EntityBaseOnDeath(EntityBase entity)
+    {
+        ObjectPool.Despawn(entityHUDS[entity]);
+        entityHUDS.Remove(entity);
+        
+        entity.OnDeath -= EntityBaseOnDeath;
+    }
+
     private void LateUpdate()
     {
-        //TODO: Process abrsact hud-objects with abstact anchors
-        
-//            Vector2 screenPoint = Root.CameraController.WorldToScreenPoint(userBodyHUDPoint.position);
-//            Vector2 localPoint;
-//            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(hudContainer, screenPoint, null, out localPoint))
-//            {
-//                userBodyHUD.localPosition = localPoint;
-//            }
-        
+        foreach (var entityHUDPair in entityHUDS)
+        {
+            var entity = entityHUDPair.Key;
+            var hud = entityHUDPair.Value;
+            
+            hud.SetText(entity.GetDebugEntityInfo());
+            
+            Vector2 screenPoint = Root.CameraController.WorldToScreenPoint(entity.HUDPoint);
+            Vector2 localPoint;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(hudContainer, screenPoint, null, out localPoint))
+            {
+                hud.transform.localPosition = localPoint;
+            }
+        }
     }
 }

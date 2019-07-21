@@ -7,21 +7,31 @@ public class Eater : MonoBehaviour
 {
     public event Action OnStarved = () => { };
     
-    public float fullness;
+    [SerializeField] private float maxFullness = 10f;
+
+    [SerializeField] private float currentFullenss;
+    
+    
     public float hungerSpeed;
 
 
     public void Init()
     {
-        
+        currentFullenss = maxFullness;
     }
+
+    public string GetDebugString()
+    {
+        return $"{currentFullenss:F2}";
+    }
+    
 
     // Update is called once per frame
     void Update()
     {
-        fullness -= hungerSpeed * Time.deltaTime;
+        currentFullenss -= hungerSpeed * Time.deltaTime;
 
-        if (fullness <= 0)
+        if (currentFullenss <= 0)
         {
             OnStarved();
         }

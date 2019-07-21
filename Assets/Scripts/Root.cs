@@ -8,7 +8,8 @@ public class Root : MonoBehaviour
     [SerializeField] private CameraController cameraController = null;
     [SerializeField] private UIManager uiManager = null;
     [SerializeField] private PlayerInput playerInput = null;
-
+    [SerializeField] private EntityTracker entityTracker = null;
+    
     private static Root _instance;
 
     private void Awake()
@@ -27,6 +28,6 @@ public class Root : MonoBehaviour
     public static ConfigManager ConfigManager => _instance.configManager;
     public static CameraController CameraController => _instance.cameraController;
     public static UIManager UIManager => _instance.uiManager;
-
     public static PlayerInput PlayerInput => _instance.playerInput;
+    public static EntityTracker EntityTracker => _instance.entityTracker;
 }

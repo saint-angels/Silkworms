@@ -3,28 +3,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public enum Direction
+{
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+}
+
 public class PlayerInput : MonoBehaviour
 {
 
-    public event Action<Vector2> OnDirectionPressed = (direction) => { };
+    public event Action<Direction> OnDirectionPressed = (direction) => { };
     
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            OnDirectionPressed(Vector2.left);
+            OnDirectionPressed(Direction.LEFT);
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            OnDirectionPressed(Vector2.right);
+            OnDirectionPressed(Direction.RIGHT);
         }
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            OnDirectionPressed(Vector2.up);
+            OnDirectionPressed(Direction.UP);
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            OnDirectionPressed(Vector2.down);
+            OnDirectionPressed(Direction.DOWN);
         }
     }
 }
