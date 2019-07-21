@@ -20,6 +20,8 @@ public class Root : MonoBehaviour
     {
         cameraController.Init();
         uiManager.Init();
+        
+        FindObjectOfType<SpawnerManual>().Init();
     }
 
     public static ConfigManager ConfigManager => _instance.configManager;
