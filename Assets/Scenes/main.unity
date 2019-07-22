@@ -241,6 +241,8 @@ MonoBehaviour:
   hudContainer: {fileID: 1859508995}
   hudPrefab: {fileID: 2373606910853052146, guid: 815a431695c798041ab896ad801a2961,
     type: 3}
+  eatLinePrefab: {fileID: -3412166246671776109, guid: b86c8bfaeeb4b1c4bb31d594c0dadcf0,
+    type: 3}
 --- !u!4 &336613623
 Transform:
   m_ObjectHideFlags: 0

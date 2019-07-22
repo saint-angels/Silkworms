@@ -38,9 +38,12 @@ public class SpawnerManual : MonoBehaviour
                 spawnPosition = pointRight.position;
                 break;
         }
-
+        
         EntityBase entityBase = Root.EntityTracker.SpawnEntity(GetRandomEntityType());
-        entityBase.transform.position = spawnPosition;
+
+        var circle = UnityEngine.Random.insideUnitCircle;
+        Vector3 randomCircle3 = new Vector3(circle.x, circle.y, 0);
+        entityBase.transform.position = spawnPosition + randomCircle3 * 5f;
     }
 
     private EntityType GetRandomEntityType()
