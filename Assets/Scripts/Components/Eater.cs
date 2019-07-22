@@ -10,6 +10,7 @@ public class Eater : MonoBehaviour
     [SerializeField] private float maxFullness = 10f;
 
     [SerializeField] private float currentFullenss;
+    [SerializeField] private float biteSize;
     
     
     public float hungerSpeed;
@@ -25,10 +26,22 @@ public class Eater : MonoBehaviour
         return $"{currentFullenss:F2}";
     }
     
-
-    // Update is called once per frame
+    
     void Update()
     {
+        var availableFood = Root.EntityTracker.GetAllFood();
+        for (int i = availableFood.Count - 1; i >= 0; i--)
+        {
+            Food foodEntity = availableFood[i];
+
+            float distance = Vector3.Distance(foodEntity.transform.position, transform.position);
+
+            if (distance < 2f)
+            {
+                currentFullenss += foodEntity.Bite(biteSize * Time.deltaTime);
+            }
+        }
+
         currentFullenss -= hungerSpeed * Time.deltaTime;
 
         if (currentFullenss <= 0)

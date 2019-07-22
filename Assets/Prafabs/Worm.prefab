@@ -60,6 +60,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxFullness: 0.1
   currentFullenss: 0
+  biteSize: 1
   hungerSpeed: 0.1
 --- !u!1 &5504987736771170444
 GameObject:

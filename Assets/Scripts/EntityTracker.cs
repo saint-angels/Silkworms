@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum EntityType
@@ -49,9 +50,9 @@ public class EntityTracker : MonoBehaviour
         return newEntity;
     }
 
-    public IEnumerable<Food> GetAllFood()
+    public List<Food> GetAllFood()
     {
-        return entityFoods.Values;
+        return entityFoods.Values.ToList();
     }
     
     private void OnEntityDeath(EntityBase deadEntity)
