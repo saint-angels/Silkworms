@@ -8,7 +8,7 @@ public class Root : MonoBehaviour
     [SerializeField] private CameraController cameraController = null;
     [SerializeField] private UIManager uiManager = null;
     [SerializeField] private PlayerInput playerInput = null;
-    [SerializeField] private EntityTracker entityTracker = null;
+    [SerializeField] private GridManager grid = null;
     
     private static Root _instance;
 
@@ -21,13 +21,13 @@ public class Root : MonoBehaviour
     {
         cameraController.Init();
         uiManager.Init();
-        
-        FindObjectOfType<SpawnerManual>().Init();
+        grid.Init();
     }
 
+
+    public static GridManager GridManager => _instance.grid;
     public static ConfigManager ConfigManager => _instance.configManager;
     public static CameraController CameraController => _instance.cameraController;
     public static UIManager UIManager => _instance.uiManager;
     public static PlayerInput PlayerInput => _instance.playerInput;
-    public static EntityTracker EntityTracker => _instance.entityTracker;
 }

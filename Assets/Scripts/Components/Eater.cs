@@ -95,26 +95,26 @@ public class Eater : MonoBehaviour
 
     private void IdleBehaviour()
     {
-        Food closestFood = null;
-        float closestFoodDistance = float.MaxValue;
-        
-        var availableFood = Root.EntityTracker.GetAllFood();
-        for (int i = availableFood.Count - 1; i >= 0; i--)
-        {
-            Food foodEntity = availableFood[i];
-
-            float distance = Vector3.Distance(foodEntity.transform.position, transform.position);
-
-
-            if (distance < closestFoodDistance)
-            {
-                TargetFood = foodEntity;
-            }
-        }
-
-        if (TargetFood != null)
-        {
-            state = EaterState.APPROACHING_FOOD;            
-        }
+//        Food closestFood = null;
+//        float closestFoodDistance = float.MaxValue;
+//        
+//        var availableFood = Root.EntityTracker.GetAllFood();
+//        for (int i = availableFood.Count - 1; i >= 0; i--)
+//        {
+//            Food foodEntity = availableFood[i];
+//
+//            float distance = Vector3.Distance(foodEntity.transform.position, transform.position);
+//
+//
+//            if (distance < closestFoodDistance)
+//            {
+//                TargetFood = foodEntity;
+//            }
+//        }
+//
+//        if (TargetFood != null)
+//        {
+//            state = EaterState.APPROACHING_FOOD;            
+//        }
     }
 }

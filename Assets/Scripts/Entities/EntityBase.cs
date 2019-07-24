@@ -6,6 +6,9 @@ using UnityEngine;
 public abstract class EntityBase : MonoBehaviour
 {
     public event Action<EntityBase> OnDeath = (entity) => { };
+    
+    public int X { get; set; }
+    public int Y { get; set; }
 
     public EntityType EntityType;
     
@@ -13,7 +16,6 @@ public abstract class EntityBase : MonoBehaviour
 
     public virtual void Init()
     {
-        
     }
 
     public virtual string GetDebugEntityInfo()

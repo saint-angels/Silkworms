@@ -11,13 +11,6 @@ public class Leaf : EntityBase
         food = GetComponent<Food>();
         food.OnEmpty += Die;
     }
-    
-    public override void Init()
-    {
-        base.Init();
-        
-        food.Init();
-    }
 
     protected override void Die()
     {
