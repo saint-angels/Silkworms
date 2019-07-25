@@ -15,13 +15,25 @@ public class UIManager : MonoBehaviour
     private AnimationConfig animationCfg;
     
     private Dictionary<EntityBase, HUDBase> entityHUDS = new Dictionary<EntityBase, HUDBase>();
-    private Dictionary<Eater, EntityLine> eaterLines = new Dictionary<Eater, EntityLine>();
 
+    private HUDBase[,] gridCellHUDS;
+    
     public void Init()
     {
         animationCfg = Root.ConfigManager.Animation;
-
-        
+    }
+    
+    public void SetHUDForGridCells()
+    {
+        gridCellHUDS = new HUDBase[GridManager.gridWidth, GridManager.gridHeight];
+        for (int x = 0; x < GridManager.gridWidth; x++)
+        {
+            for (int y = 0; y < GridManager.gridHeight; y++)
+            {
+                HUDBase newHud = ObjectPool.Spawn(hudPrefab, Vector3.zero, Quaternion.identity, hudContainer);
+                gridCellHUDS[x, y] = newHud;
+            }
+        }
     }
 
     public void SetHUDForEntity(EntityBase entityBase)
@@ -30,12 +42,6 @@ public class UIManager : MonoBehaviour
         
         entityHUDS.Add(entityBase, newHud);
 
-        if (entityBase.EntityType == EntityType.WORM)
-        {
-            EntityLine newEaterLine = ObjectPool.Spawn(eatLinePrefab, Vector3.zero, Quaternion.identity);
-            eaterLines.Add(entityBase.GetComponent<Eater>(), newEaterLine);
-        }
-        
         entityBase.OnDeath += EntityBaseOnDeath;
     }
 
@@ -44,12 +50,6 @@ public class UIManager : MonoBehaviour
         ObjectPool.Despawn(entityHUDS[entity]);
         entityHUDS.Remove(entity);
         
-        if (entity.EntityType == EntityType.WORM)
-        {
-            var eater = entity.GetComponent<Eater>();
-            ObjectPool.Despawn(eaterLines[eater]);
-            eaterLines.Remove(eater);
-        }
         
         entity.OnDeath -= EntityBaseOnDeath;
     }
@@ -71,20 +71,35 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        foreach (var eaterLineKeyPair in eaterLines)
+        if (gridCellHUDS != null)
         {
-            var eater = eaterLineKeyPair.Key;
-            var line = eaterLineKeyPair.Value;
-
-            bool haveFoodTarget = eater.TargetFood != null;
-            
-            line.gameObject.SetActive(haveFoodTarget);
-            if (haveFoodTarget)
+            for (int x = 0; x < GridManager.gridWidth; x++)
             {
-                line.Init(eater.transform.position, eater.TargetFood.transform.position);        
+                for (int y = 0; y < GridManager.gridHeight; y++)
+                {
+                    var hud = gridCellHUDS[x,y];
+
+                    Vector3 worldPosition = Root.GridManager.IndecesToPosition(x, y) + new Vector3(GridManager.cellWidth / 2f, GridManager.cellHeight/ 2f, 0);
+                    Vector2 screenPoint = Root.CameraController.WorldToScreenPoint(worldPosition);
+                    Vector2 localPoint;
+                    if (RectTransformUtility.ScreenPointToLocalPointInRectangle(hudContainer, screenPoint, null, out localPoint))
+                    {
+                        hud.transform.localPosition = localPoint;
+                    }
+
+                    var entityBase = Root.GridManager.Grid[x, y];
+
+                    if (entityBase == null)
+                    {
+                        hud.SetText("null");
+                    }
+                    else
+                    {
+                        hud.SetText(entityBase.EntityType.ToString());
+                    }
+                }
             }
-            
-            
         }
+        
     }
 }

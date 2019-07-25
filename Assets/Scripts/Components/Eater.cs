@@ -98,7 +98,7 @@ public class Eater : MonoBehaviour
 //        Food closestFood = null;
 //        float closestFoodDistance = float.MaxValue;
 //        
-//        var availableFood = Root.EntityTracker.GetAllFood();
+//        var availableFood  = Root.EntityTracker.GetAllFood();
 //        for (int i = availableFood.Count - 1; i >= 0; i--)
 //        {
 //            Food foodEntity = availableFood[i];

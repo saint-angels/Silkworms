@@ -15,11 +15,19 @@ public class GridManager : MonoBehaviour
     [SerializeField] private EntityBase wormPrefab;
     [SerializeField] private EntityBase leafPrefab;
     
-    private EntityBase[, ] grid;
-
-    private int gridWidth = 5;
-    private int gridHeight = 5;
+    [SerializeField] private GameObject gridBackgroundCell;
     
+    
+    
+    public EntityBase[, ] Grid { get; private set; }
+
+    
+    public const int gridWidth = 5;
+    public const int gridHeight = 5;
+    public const float cellWidth = 1f;
+    public const float cellHeight = 1f;
+    
+     
     private Dictionary<Direction, Vector2Int> directionVectors = new Dictionary<Direction, Vector2Int>()
     {
         { Direction.UP, Vector2Int.up},
@@ -30,7 +38,18 @@ public class GridManager : MonoBehaviour
     
     public void Init()
     {
-        grid = new EntityBase[gridWidth,gridHeight];
+        Grid = new EntityBase[gridWidth,gridHeight];
+
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                var newBgCell = Instantiate(gridBackgroundCell, IndecesToPosition(x, y), Quaternion.identity);
+                newBgCell.transform.SetParent(gameObject.transform);
+            }
+        }
+        
+        Root.UIManager.SetHUDForGridCells();
         
         Root.PlayerInput.OnDirectionPressed += OnDirectionPressed;
     }
@@ -48,9 +67,8 @@ public class GridManager : MonoBehaviour
                 break;
         }
         
-        if (IsPositionValid(x, y) && grid[x,y] == null)
+        if (IsPositionValid(x, y) && Grid[x,y] == null)
         {
-            grid[x, y] = newEntity;
             newEntity.OnDeath += OnEntityDeath; 
             newEntity.Init();
             
@@ -66,18 +84,20 @@ public class GridManager : MonoBehaviour
     {
         if (clearPrevious)
         {
-            grid[entity.X, entity.Y] = null;    
+            Grid[entity.X, entity.Y] = null;    
         }
         
         entity.X = newX;
         entity.Y = newY;
+
+        Grid[newX, newY] = entity;
 
         entity.transform.position = IndecesToPosition(newX, newY);
     }
 
     private void OnEntityDeath(EntityBase deadEntity)
     {
-        grid[deadEntity.X, deadEntity.Y] = null;
+        Grid[deadEntity.X, deadEntity.Y] = null;
         deadEntity.OnDeath -= OnEntityDeath; 
     }
 
@@ -87,19 +107,19 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < gridHeight; y++)
             {
-                action(x, y, grid[x,y]);
+                action(x, y, Grid[x,y]);
             }
         }
     }
 
     private bool IsPositionValid(int x, int y)
     {
-        return 0 <= x && x < grid.GetLength(0) && 0 <= y && y < grid.GetLength(1);
+        return 0 <= x && x < Grid.GetLength(0) && 0 <= y && y < Grid.GetLength(1);
     }
 
-    private Vector3 IndecesToPosition(int x, int y)
+    public Vector3 IndecesToPosition(int x, int y)
     {
-        return new Vector3(x, y, 0);
+        return new Vector3(x * cellWidth, y * cellHeight, 0);
     }
 
     private void OnDirectionPressed(Direction direction)
@@ -115,14 +135,14 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < gridHeight; y++)
             {
-                EntityBase e = grid[x, y];
-                Vector2Int shiftIndeces = new Vector2Int(x + directionVector.x, y + directionVector.y);
+                EntityBase e = Grid[x, y];
+                Vector2Int shiftedIndeces = new Vector2Int(x + directionVector.x, y + directionVector.y);
 
-                bool shiftSpaceEmpty = IsPositionValid(shiftIndeces.x, shiftIndeces.y) &&
-                                  grid[shiftIndeces.x, shiftIndeces.y] == null; 
+                bool shiftSpaceEmpty = IsPositionValid(shiftedIndeces.x, shiftedIndeces.y) &&
+                                  Grid[shiftedIndeces.x, shiftedIndeces.y] == null; 
                 if (e != null && shiftSpaceEmpty)
                 {
-                    MoveEntityToIndeces(e, shiftIndeces.x, shiftIndeces.y, true);
+                    MoveEntityToIndeces(e, shiftedIndeces.x, shiftedIndeces.y, true);
                 }
             }
         }
@@ -147,25 +167,25 @@ public class GridManager : MonoBehaviour
 
                 for (int x = 0; x < gridWidth; x++)
                 {
-                    if (grid[x, 0] == null) emptyCells.Add(new Vector2Int(x, 0));
+                    if (Grid[x, 0] == null) emptyCells.Add(new Vector2Int(x, 0));
                 }
                 break;
             case Direction.DOWN:
                 for (int x = 0; x < gridWidth; x++)
                 {
-                    if (grid[x, gridHeight - 1] == null) emptyCells.Add(new Vector2Int(x, gridHeight - 1));
+                    if (Grid[x, gridHeight - 1] == null) emptyCells.Add(new Vector2Int(x, gridHeight - 1));
                 }
                 break;
             case Direction.LEFT:
                 for (int y = 0; y < gridHeight; y++)
                 {
-                    if (grid[gridWidth - 1, y] == null) emptyCells.Add(new Vector2Int(gridWidth - 1, y));
+                    if (Grid[gridWidth - 1, y] == null) emptyCells.Add(new Vector2Int(gridWidth - 1, y));
                 }
                 break;
             case Direction.RIGHT:
                 for (int y = 0; y < gridHeight; y++)
                 {
-                    if (grid[0, y] == null) emptyCells.Add(new Vector2Int(0, y));
+                    if (Grid[0, y] == null) emptyCells.Add(new Vector2Int(0, y));
                 }
                 break;
         }
