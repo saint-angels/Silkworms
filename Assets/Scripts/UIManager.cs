@@ -10,6 +10,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private HUDBase hudPrefab = null;
     
     [SerializeField] private EntityLine eatLinePrefab = null;
+
+    [SerializeField] private Transform testHUDsAnchor = null;
     
     
     private AnimationConfig animationCfg;
@@ -79,7 +81,8 @@ public class UIManager : MonoBehaviour
                 {
                     var hud = gridCellHUDS[x,y];
 
-                    Vector3 worldPosition = Root.GridManager.IndecesToPosition(x, y) + new Vector3(GridManager.cellWidth / 2f, GridManager.cellHeight/ 2f, 0);
+//                    Vector3 worldPosition = Root.GridManager.IndecesToPosition(x, y) + new Vector3(GridManager.cellWidth / 2f, GridManager.cellHeight/ 2f, 0);
+                    Vector3 worldPosition = testHUDsAnchor.position + new Vector3(x / 2f, y / 2f, 0);
                     Vector2 screenPoint = Root.CameraController.WorldToScreenPoint(worldPosition);
                     Vector2 localPoint;
                     if (RectTransformUtility.ScreenPointToLocalPointInRectangle(hudContainer, screenPoint, null, out localPoint))

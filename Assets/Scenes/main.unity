@@ -243,6 +243,7 @@ MonoBehaviour:
     type: 3}
   eatLinePrefab: {fileID: -3412166246671776109, guid: b86c8bfaeeb4b1c4bb31d594c0dadcf0,
     type: 3}
+  testHUDsAnchor: {fileID: 883002334}
 --- !u!4 &336613623
 Transform:
   m_ObjectHideFlags: 0
@@ -255,6 +256,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 800000656}
+  - {fileID: 883002334}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -357,6 +359,36 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &883002333
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 883002334}
+  m_Layer: 0
+  m_Name: TestHUDsAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &883002334
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 883002333}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.38, y: 0.46, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 336613623}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1373927376
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,6 +469,8 @@ MonoBehaviour:
   wormPrefab: {fileID: 5504987736648747411, guid: a7f44b1b56653a742a64dbf47cf24da8,
     type: 3}
   leafPrefab: {fileID: 2546892496986129609, guid: 528f771ebe9965a4b9b43d648c87b0b6,
+    type: 3}
+  mothPrefab: {fileID: 5504987736648747411, guid: 98154e4a0cdc7964e8f25eabbbab073a,
     type: 3}
   gridBackgroundCell: {fileID: 3396215031932118779, guid: c4bd700cd124f3143a074f18db69e1d9,
     type: 3}

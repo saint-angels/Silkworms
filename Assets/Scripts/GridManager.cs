@@ -7,13 +7,15 @@ using Random = System.Random;
 public enum EntityType
 {    
     WORM,
-    LEAF
+    LEAF,
+    MOTH
 }
 
 public class GridManager : MonoBehaviour
 {
     [SerializeField] private EntityBase wormPrefab;
     [SerializeField] private EntityBase leafPrefab;
+    [SerializeField] private EntityBase mothPrefab;
     
     [SerializeField] private GameObject gridBackgroundCell;
     
@@ -64,6 +66,9 @@ public class GridManager : MonoBehaviour
                 break;
             case EntityType.LEAF:
                 newEntity = ObjectPool.Spawn(leafPrefab);
+                break;
+            case EntityType.MOTH:
+                newEntity = ObjectPool.Spawn(mothPrefab);
                 break;
         }
         
@@ -131,21 +136,27 @@ public class GridManager : MonoBehaviour
         //TODO: Process cells according to input direction
 
         Vector2Int directionVector = directionVectors[direction];
-        for (int x = 0; x < gridWidth; x++)
-        {
-            for (int y = 0; y < gridHeight; y++)
-            {
-                EntityBase e = Grid[x, y];
-                Vector2Int shiftedIndeces = new Vector2Int(x + directionVector.x, y + directionVector.y);
 
-                bool shiftSpaceEmpty = IsPositionValid(shiftedIndeces.x, shiftedIndeces.y) &&
-                                  Grid[shiftedIndeces.x, shiftedIndeces.y] == null; 
-                if (e != null && shiftSpaceEmpty)
-                {
-                    MoveEntityToIndeces(e, shiftedIndeces.x, shiftedIndeces.y, true);
-                }
+        IterateOverGrid((x, y, e) =>
+        {
+            Vector2Int shiftedIndeces = new Vector2Int(x + directionVector.x, y + directionVector.y);
+
+            bool shiftSpaceEmpty = IsPositionValid(shiftedIndeces.x, shiftedIndeces.y) &&
+                                   Grid[shiftedIndeces.x, shiftedIndeces.y] == null; 
+            if (e != null && shiftSpaceEmpty && e.movedThisTurn == false)
+            {
+                MoveEntityToIndeces(e, shiftedIndeces.x, shiftedIndeces.y, true);
+                e.movedThisTurn = true;
             }
-        }
+        });
+
+        IterateOverGrid((x, y, e) =>
+        {
+            if (e != null)
+            {
+                e.movedThisTurn = false;
+            }
+        });
         
         
         
@@ -153,8 +164,9 @@ public class GridManager : MonoBehaviour
         List<Vector2Int> emptyEdgeCells = GetEdgeCellsForDirection(direction);
 
         Vector2Int emptyCell = emptyEdgeCells[UnityEngine.Random.Range(0, emptyEdgeCells.Count)];
-        
-        CreateNewEntity(EntityType.WORM, emptyCell.x, emptyCell.y);
+
+        EntityType randomEntityType = GetRandomEntityType();
+        CreateNewEntity(randomEntityType, emptyCell.x, emptyCell.y);
     }
 
     private List<Vector2Int> GetEdgeCellsForDirection(Direction direction)
@@ -191,5 +203,12 @@ public class GridManager : MonoBehaviour
         }
 
         return emptyCells;
+    }
+    
+    private EntityType GetRandomEntityType()
+    {
+        Array values = Enum.GetValues(typeof(EntityType));
+        Random random = new Random();
+        return (EntityType)values.GetValue(random.Next(values.Length));   
     }
 }

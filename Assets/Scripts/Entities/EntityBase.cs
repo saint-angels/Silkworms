@@ -7,6 +7,8 @@ public abstract class EntityBase : MonoBehaviour
 {
     public event Action<EntityBase> OnDeath = (entity) => { };
     
+    public bool movedThisTurn { get; set; }
+    
     public int X { get; set; }
     public int Y { get; set; }
 
