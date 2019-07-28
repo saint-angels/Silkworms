@@ -16,6 +16,7 @@ public class PlayerInput : MonoBehaviour
 {
 
     public event Action<Direction> OnDirectionPressed = (direction) => { };
+    public event Action OnResetPressed = () => { };
     
     void Update()
     {
@@ -34,6 +35,10 @@ public class PlayerInput : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             OnDirectionPressed(Direction.DOWN);
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            OnResetPressed();
         }
     }
 }

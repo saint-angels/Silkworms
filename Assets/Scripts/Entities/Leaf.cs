@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class Leaf : EntityBase
 {
-    private Food food;
-    
-    private void Awake()
+    public override void Init()
     {
-        food = GetComponent<Food>();
-        food.OnEmpty += Die;
+        base.Init();
+        
+        GetComponent<Food>().Init(this);
     }
 
-    protected override void Die()
+    private void Awake()
+    {
+    }
+
+    public override void Die()
     {
         base.Die();
     }

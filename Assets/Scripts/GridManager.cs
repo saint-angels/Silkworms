@@ -19,8 +19,6 @@ public class GridManager : MonoBehaviour
     
     [SerializeField] private GameObject gridBackgroundCell;
     
-    
-    
     public EntityBase[, ] Grid { get; private set; }
 
     
@@ -28,7 +26,9 @@ public class GridManager : MonoBehaviour
     public const int gridHeight = 5;
     public const float cellWidth = 1f;
     public const float cellHeight = 1f;
-    
+
+
+    private EntityType[] entitiesToSpawn = new EntityType[] { EntityType.LEAF, EntityType.WORM };
      
     private Dictionary<Direction, Vector2Int> directionVectors = new Dictionary<Direction, Vector2Int>()
     {
@@ -54,6 +54,7 @@ public class GridManager : MonoBehaviour
         Root.UIManager.SetHUDForGridCells();
         
         Root.PlayerInput.OnDirectionPressed += OnDirectionPressed;
+        Root.PlayerInput.OnResetPressed += ResetGrid;
     }
 
     public void CreateNewEntity(EntityType entityType, int x, int y)
@@ -106,14 +107,38 @@ public class GridManager : MonoBehaviour
         deadEntity.OnDeath -= OnEntityDeath; 
     }
 
-    private void IterateOverGrid(Action<int,int, EntityBase> action)
+    private void IterateOverGrid(Direction dir, Action<int,int, EntityBase> action)
     {
-        for (int x = 0; x < gridWidth; x++)
+        switch (dir)
         {
-            for (int y = 0; y < gridHeight; y++)
-            {
-                action(x, y, Grid[x,y]);
-            }
+            case Direction.DOWN:
+            case Direction.LEFT:
+                for (int x = 0; x < gridWidth; x++)
+                {
+                    for (int y = 0; y < gridHeight; y++)
+                    {
+                        action(x, y, Grid[x,y]);
+                    }
+                }
+                break;
+            case Direction.UP:
+                for (int x = 0; x < gridWidth; x++)
+                {
+                    for (int y = gridHeight - 1; y >= 0; y--)
+                    {
+                        action(x, y, Grid[x,y]);
+                    }
+                }
+                break;
+            case Direction.RIGHT:
+                for (int x = gridWidth - 1; x >= 0; x--)
+                {
+                    for (int y = 0; y < gridHeight; y++)
+                    {
+                        action(x, y, Grid[x,y]);
+                    }
+                }
+                break;
         }
     }
 
@@ -129,44 +154,92 @@ public class GridManager : MonoBehaviour
 
     private void OnDirectionPressed(Direction direction)
     {
-        //Can shift?
-        //TODO: Check if shift is possible
         bool anyEntityShifted = true;
-        
-        //TODO: Process cells according to input direction
 
         Vector2Int directionVector = directionVectors[direction];
 
-        IterateOverGrid((x, y, e) =>
+        IterateOverGrid(direction, (x, y, e) =>
         {
             Vector2Int shiftedIndeces = new Vector2Int(x + directionVector.x, y + directionVector.y);
 
-            bool shiftSpaceEmpty = IsPositionValid(shiftedIndeces.x, shiftedIndeces.y) &&
-                                   Grid[shiftedIndeces.x, shiftedIndeces.y] == null; 
+            bool positionValid = IsPositionValid(shiftedIndeces.x, shiftedIndeces.y);
+            EntityBase shiftTargetEntity = positionValid ? Grid[shiftedIndeces.x, shiftedIndeces.y] : null;
+            
+            bool shiftSpaceEmpty = positionValid &&
+                                   shiftTargetEntity == null; 
             if (e != null && shiftSpaceEmpty && e.movedThisTurn == false)
             {
+                anyEntityShifted = true;
                 MoveEntityToIndeces(e, shiftedIndeces.x, shiftedIndeces.y, true);
                 e.movedThisTurn = true;
             }
+            else if(e != null && positionValid && shiftTargetEntity != null)
+            {
+                InteractionResult result = InteractionSystem.Handle(e, shiftTargetEntity);
+
+
+                switch (result)
+                {
+                    case InteractionResult.NONE:
+                        InteractionResult result2 = InteractionSystem.Handle(shiftTargetEntity, e);
+                        switch (result2)
+                        {
+                            case InteractionResult.TARGET_DEATH:
+                                e.Die();
+                                break;
+                            case InteractionResult.ACTOR_DEATH:
+                                shiftTargetEntity.Die();
+                                break;
+                        }
+                        break;
+                    case InteractionResult.TARGET_DEATH:
+                        shiftTargetEntity.Die();
+                        break;
+                    case InteractionResult.ACTOR_DEATH:
+                        e.Die();
+                        break;
+                }
+            }
         });
 
-        IterateOverGrid((x, y, e) =>
+        IterateOverGrid(direction,(x, y, e) =>
         {
             if (e != null)
             {
                 e.movedThisTurn = false;
             }
         });
-        
-        
-        
-        //Get cell for spawn
-        List<Vector2Int> emptyEdgeCells = GetEdgeCellsForDirection(direction);
 
-        Vector2Int emptyCell = emptyEdgeCells[UnityEngine.Random.Range(0, emptyEdgeCells.Count)];
+        if (anyEntityShifted)
+        {
+            //Get cell for spawn
+            List<Vector2Int> emptyEdgeCells = GetEdgeCellsForDirection(direction);
 
-        EntityType randomEntityType = GetRandomEntityType();
-        CreateNewEntity(randomEntityType, emptyCell.x, emptyCell.y);
+            if (emptyEdgeCells.Count == 0)
+            {
+                ResetGrid();
+            }
+            else
+            {
+                Vector2Int emptyCell = emptyEdgeCells[UnityEngine.Random.Range(0, emptyEdgeCells.Count)];
+
+                EntityType randomEntityType = entitiesToSpawn[UnityEngine.Random.Range(0, entitiesToSpawn.Length)];
+                CreateNewEntity(randomEntityType, emptyCell.x, emptyCell.y);
+            }
+
+        }
+    }
+
+
+    private void ResetGrid()
+    {
+        IterateOverGrid(Direction.LEFT, (x, y, e) =>
+        {
+            if (e != null)
+            {
+                e.Die();
+            }   
+        });
     }
 
     private List<Vector2Int> GetEdgeCellsForDirection(Direction direction)

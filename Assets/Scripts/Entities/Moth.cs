@@ -20,7 +20,7 @@ public class Moth : EntityBase
         
     }
 
-    protected override void Die()
+    public override void Die()
     {
         base.Die();
         

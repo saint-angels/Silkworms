@@ -5,8 +5,11 @@ using UnityEngine;
 
 public class Silkworm : EntityBase
 {
-    private void Awake()
+    public override void Init()
     {
+        base.Init();
+        
+        GetComponent<Eater>().Init(this);
     }
 
     public override string GetDebugEntityInfo()
@@ -20,7 +23,7 @@ public class Silkworm : EntityBase
         
     }
 
-    protected override void Die()
+    public override void Die()
     {
         base.Die();
         

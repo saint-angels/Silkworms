@@ -9,6 +9,8 @@ public abstract class EntityBase : MonoBehaviour
     
     public bool movedThisTurn { get; set; }
     
+    public EntityBase InteractingWith { get; set; }
+    
     public int X { get; set; }
     public int Y { get; set; }
 
@@ -25,7 +27,7 @@ public abstract class EntityBase : MonoBehaviour
         return string.Empty;
     }
 
-    protected virtual void Die()
+    public virtual void Die()
     {
         OnDeath(this);
         
