@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
@@ -41,6 +42,17 @@ public static class InteractionSystem
 
     private static bool TryEat(Eater eater, Food food)
     {
+        switch (eater.Owner.EntityType)
+        {
+            case EntityType.WORM:
+                eater.Owner.morphingInto = EntityType.COCOON;
+                break;
+            case EntityType.LEAF:
+                break;
+            case EntityType.MOTH:
+                break;
+        }
+        
         return true;
     }
 }

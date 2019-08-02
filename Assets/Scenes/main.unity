@@ -472,6 +472,7 @@ MonoBehaviour:
     type: 3}
   mothPrefab: {fileID: 5504987736648747411, guid: 98154e4a0cdc7964e8f25eabbbab073a,
     type: 3}
+  cocoonPrefab: {fileID: 0}
   gridBackgroundCell: {fileID: 3396215031932118779, guid: c4bd700cd124f3143a074f18db69e1d9,
     type: 3}
 --- !u!4 &1829805356

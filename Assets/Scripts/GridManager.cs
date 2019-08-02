@@ -8,7 +8,8 @@ public enum EntityType
 {    
     WORM,
     LEAF,
-    MOTH
+    MOTH,
+    COCOON
 }
 
 public class GridManager : MonoBehaviour
@@ -16,19 +17,19 @@ public class GridManager : MonoBehaviour
     [SerializeField] private EntityBase wormPrefab;
     [SerializeField] private EntityBase leafPrefab;
     [SerializeField] private EntityBase mothPrefab;
+    [SerializeField] private EntityBase cocoonPrefab;
     
     [SerializeField] private GameObject gridBackgroundCell;
     
     public EntityBase[, ] Grid { get; private set; }
 
-    
     public const int gridWidth = 5;
     public const int gridHeight = 5;
     public const float cellWidth = 1f;
     public const float cellHeight = 1f;
 
 
-    private EntityType[] entitiesToSpawn = new EntityType[] { EntityType.LEAF, EntityType.WORM };
+    private EntityType[] autspawnEntities = new EntityType[] { EntityType.LEAF, EntityType.WORM };
      
     private Dictionary<Direction, Vector2Int> directionVectors = new Dictionary<Direction, Vector2Int>()
     {
@@ -70,6 +71,9 @@ public class GridManager : MonoBehaviour
                 break;
             case EntityType.MOTH:
                 newEntity = ObjectPool.Spawn(mothPrefab);
+                break;
+            case EntityType.COCOON:
+                newEntity = ObjectPool.Spawn(cocoonPrefab);
                 break;
         }
         
@@ -158,7 +162,7 @@ public class GridManager : MonoBehaviour
 
         Vector2Int directionVector = directionVectors[direction];
 
-        IterateOverGrid(direction, (x, y, e) =>
+        IterateOverGrid(direction, (x, y, entity) =>
         {
             Vector2Int shiftedIndeces = new Vector2Int(x + directionVector.x, y + directionVector.y);
 
@@ -167,25 +171,25 @@ public class GridManager : MonoBehaviour
             
             bool shiftSpaceEmpty = positionValid &&
                                    shiftTargetEntity == null; 
-            if (e != null && shiftSpaceEmpty && e.movedThisTurn == false)
+            if (entity != null && shiftSpaceEmpty && entity.movedThisTurn == false)
             {
                 anyEntityShifted = true;
-                MoveEntityToIndeces(e, shiftedIndeces.x, shiftedIndeces.y, true);
-                e.movedThisTurn = true;
+                MoveEntityToIndeces(entity, shiftedIndeces.x, shiftedIndeces.y, true);
+                entity.movedThisTurn = true;
             }
-            else if(e != null && positionValid && shiftTargetEntity != null)
+            else if(entity != null && positionValid && shiftTargetEntity != null)
             {
-                InteractionResult result = InteractionSystem.Handle(e, shiftTargetEntity);
+                InteractionResult result = InteractionSystem.Handle(entity, shiftTargetEntity);
 
 
                 switch (result)
                 {
                     case InteractionResult.NONE:
-                        InteractionResult result2 = InteractionSystem.Handle(shiftTargetEntity, e);
-                        switch (result2)
+                        InteractionResult swappedResult = InteractionSystem.Handle(shiftTargetEntity, entity);
+                        switch (swappedResult)
                         {
                             case InteractionResult.TARGET_DEATH:
-                                e.Die();
+                                entity.Die();
                                 break;
                             case InteractionResult.ACTOR_DEATH:
                                 shiftTargetEntity.Die();
@@ -196,8 +200,17 @@ public class GridManager : MonoBehaviour
                         shiftTargetEntity.Die();
                         break;
                     case InteractionResult.ACTOR_DEATH:
-                        e.Die();
+                        entity.Die();
                         break;
+                }
+
+                if (entity != null && entity.morphingInto.HasValue)
+                {
+                    entity.Die();
+                }
+                else if (shiftTargetEntity != null && shiftTargetEntity.morphingInto.HasValue)
+                {
+                    
                 }
             }
         });
@@ -223,7 +236,7 @@ public class GridManager : MonoBehaviour
             {
                 Vector2Int emptyCell = emptyEdgeCells[UnityEngine.Random.Range(0, emptyEdgeCells.Count)];
 
-                EntityType randomEntityType = entitiesToSpawn[UnityEngine.Random.Range(0, entitiesToSpawn.Length)];
+                EntityType randomEntityType = autspawnEntities[UnityEngine.Random.Range(0, autspawnEntities.Length)];
                 CreateNewEntity(randomEntityType, emptyCell.x, emptyCell.y);
             }
 

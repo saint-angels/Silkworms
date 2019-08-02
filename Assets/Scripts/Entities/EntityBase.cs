@@ -15,6 +15,8 @@ public abstract class EntityBase : MonoBehaviour
     public int Y { get; set; }
 
     public EntityType EntityType;
+
+    public EntityType? morphingInto;
     
     public Vector3 HUDPoint => transform.position + Vector3.up;
 
